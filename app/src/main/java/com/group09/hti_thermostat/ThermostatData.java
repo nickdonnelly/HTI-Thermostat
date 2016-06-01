@@ -1,5 +1,7 @@
 package com.group09.hti_thermostat;
 
+import android.app.AlertDialog;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 

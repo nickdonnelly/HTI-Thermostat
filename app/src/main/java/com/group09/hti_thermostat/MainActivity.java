@@ -70,10 +70,10 @@ public class MainActivity extends AppCompatActivity {
             XmlPullParser parser = xmlFactory.newPullParser();
 
             parser.setInput(stringToInputStream(response), null);
-
             WeekProgram = new ArrayList();
             // Now we loop until we reach the end of the XML
             try{
+                parser.nextTag(); // This reads off the "thermostat" surrounding tag.
                 while(parser.next() != XmlPullParser.END_TAG){
                     if(parser.getEventType() != XmlPullParser.START_TAG){
                         continue;
@@ -95,9 +95,10 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.i("XMLPARSE", "Done parsing!");
         new AlertDialog.Builder(this)
-                .setTitle("Done parsing")
+                .setTitle(ThermostatData.time)
                 .setMessage(ThermostatData.current_day)
                 .show();
+
     }
 
 
