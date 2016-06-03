@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -38,10 +40,19 @@ public class MainActivity extends AppCompatActivity {
     public static ArrayList WeekProgram;
     public static RequestQueue reqQueue;
 
+
+    // UI ELEMENTS
+    public static TextView tvTemperature;
+    public static Button btnMinus;
+    public static Button btnPlus;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        tvTemperature = (TextView) findViewById(R.id.tvTemperature);
+        btnMinus = (Button) findViewById(R.id.btnSub);
+        btnPlus = (Button) findViewById(R.id.btnAdd);
         // This queue makes the request
         reqQueue = Volley.newRequestQueue(this);
         // StringRequest holds the initial request data
@@ -50,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(String httpResponse){
                 XmlHandler.parseEntireDataset(httpResponse);
                 buildAlert(ThermostatData.time, ThermostatData.current_day);
+                tvTemperature.setText(ThermostatData.current_temperature + "C");
             }
         }, new Response.ErrorListener(){
             @Override
@@ -58,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         reqQueue.add(strReq); // queue the request to be made.
+
     }
 
 
