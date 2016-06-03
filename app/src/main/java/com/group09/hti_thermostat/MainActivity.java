@@ -31,82 +31,42 @@ public class MainActivity extends AppCompatActivity {
     // This can be requested to get *all* of the information stored in the web API.
     public static final String API_BASE_URL = "http://wwwis.win.tue.nl/2id40-ws/9";
     public static final String API_BACKUP_BASE_URL = "http://pcwin889.win.tue.nl/2id40-ws/9";
+
     public static double CurrentTemperature; // These 4 may not be used, not sure yet.
     public static double DayTemperature;
     public static double NightTemperature;
     public static ArrayList WeekProgram;
-
+    public static RequestQueue reqQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         // This queue makes the request
-        RequestQueue initialQueue = Volley.newRequestQueue(this);
-        // stringrequest holds the initial request data
-        StringRequest strReq = new StringRequest(Request.Method.GET, API_BACKUP_BASE_URL, new Response.Listener<String>(){
+        reqQueue = Volley.newRequestQueue(this);
+        // StringRequest holds the initial request data
+        StringRequest strReq = new StringRequest(Request.Method.GET, API_BASE_URL, new Response.Listener<String>(){
             @Override
             public void onResponse(String httpResponse){
-                parseEntireDataset(httpResponse);
+                XmlHandler.parseEntireDataset(httpResponse);
+                buildAlert(ThermostatData.time, ThermostatData.current_day);
             }
         }, new Response.ErrorListener(){
             @Override
             public void onErrorResponse(VolleyError err){
-                //TODO: Make an error popup
+                buildAlert("Volley Error", "There was an error retrieving data from the web API. Please ensure the API is online and try again.");
             }
         });
-        initialQueue.add(strReq); // queue the request to be made.
+        reqQueue.add(strReq); // queue the request to be made.
     }
 
-    private void parseEntireDataset(String response){
-        //TODO: Parse the XML response, check for error, then change the
-        //      view to reflect whats on the server.
 
-        // First we need an XML parser, android has these built in. We use
-        // a try-catch because this way we don't have to throw exceptions at
-        // the function level.
-        try{
-            XmlPullParserFactory xmlFactory = XmlPullParserFactory.newInstance();
-            XmlPullParser parser = xmlFactory.newPullParser();
-
-            parser.setInput(stringToInputStream(response), null);
-            WeekProgram = new ArrayList();
-            // Now we loop until we reach the end of the XML
-            try{
-                parser.nextTag(); // This reads off the "thermostat" surrounding tag.
-                while(parser.next() != XmlPullParser.END_TAG){
-                    if(parser.getEventType() != XmlPullParser.START_TAG){
-                        continue;
-                    }
-                    String tagName = parser.getName();
-                    // Send it to ThermostatData if it doesn't have a week program related tag
-                    if(!tagName.equals("week_program") && !tagName.equals("day")){
-                        ThermostatData.readThermostatData(parser, tagName);
-                    }
-                }
-            }catch (IOException e){
-                // TODO: Handle exception
-            }
-
-
-        }catch (XmlPullParserException e){
-            // TODO: Handle PullParserException
-            Log.e("Error: ", e.toString()); // log it
-        }
-        Log.i("XMLPARSE", "Done parsing!");
+    // This can only be used in non-static contexts. It will crash the app if you manage to get a static-context call to this to compile.
+    private void buildAlert(String title, String msg){
         new AlertDialog.Builder(this)
-                .setTitle(ThermostatData.time)
-                .setMessage(ThermostatData.current_day)
+                .setTitle(title)
+                .setMessage(msg)
                 .show();
-
     }
 
-
-
-    // Simple method to simplify converting the string returned in HTTP responses
-    // to InputStreams for use in XML parsing.
-    public static InputStream stringToInputStream(String str){
-        InputStream stream = new ByteArrayInputStream(str.getBytes());
-        return stream;
-    }
 }
