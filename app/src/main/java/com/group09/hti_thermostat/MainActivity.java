@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String API_BASE_URL = "http://wwwis.win.tue.nl/2id40-ws/9";
     public static final String API_BACKUP_BASE_URL = "http://pcwin889.win.tue.nl/2id40-ws/9";
 
-    public static double CurrentTemperature; // These 4 may not be used, not sure yet.
+    public static double CurrentTemperature;
     public static double DayTemperature;
     public static double NightTemperature;
     public static ArrayList WeekProgram;
@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(String httpResponse){
                 XmlHandler.parseEntireDataset(httpResponse);
                 buildAlert(ThermostatData.time, ThermostatData.current_day);
+                CurrentTemperature = Double.parseDouble(ThermostatData.current_temperature);
                 tvTemperature.setText(ThermostatData.current_temperature + "C");
             }
         }, new Response.ErrorListener(){
@@ -70,11 +71,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         reqQueue.add(strReq); // queue the request to be made.
-
     }
 
 
     // This can only be used in non-static contexts. It will crash the app if you manage to get a static-context call to this to compile.
+    // Pretty much only use this for debugging, it doesn't create confirm/exit buttons.
     private void buildAlert(String title, String msg){
         new AlertDialog.Builder(this)
                 .setTitle(title)

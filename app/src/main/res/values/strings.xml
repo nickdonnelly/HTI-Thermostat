@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Thermostat</string>
+    <string name="weekly_enabled_card">Would you like to enable the weekly program? Turning this setting off will ignore all schedule changes.</string>
 </resources>
