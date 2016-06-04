@@ -14,4 +14,25 @@ public class GeneralHelper {
         InputStream stream = new ByteArrayInputStream(str.getBytes());
         return stream;
     }
+
+    public static boolean onOffTextToBool(String text){
+        return (text == "on") ? true : false;
+    }
+
+    public static String getSubUrlName(String attribute){
+        switch(attribute){
+            case "current_day":
+                return "currentDay";
+            case "target_temperature":
+                return "targetTemperature";
+            case "day_temperature":
+                return "dayTemperature";
+            case "night_temperature":
+                return "nightTemperature";
+            case "week_program_state":
+                return "weekProgramState";
+            default:
+                return "";
+        }
+    }
 }

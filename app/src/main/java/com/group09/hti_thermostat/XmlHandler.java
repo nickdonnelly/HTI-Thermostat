@@ -3,6 +3,11 @@ package com.group09.hti_thermostat;
 import android.app.AlertDialog;
 import android.util.Log;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -49,4 +54,5 @@ public class XmlHandler {
     public static String getXMLString(String tagname, String value){
         return "<" + tagname + ">" + value + "</" + tagname + ">";
     }
+
 }
