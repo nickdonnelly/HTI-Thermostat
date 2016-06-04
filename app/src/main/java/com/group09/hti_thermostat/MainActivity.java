@@ -94,6 +94,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .show();
     }
 
+    private void buildAlertWithOK(String title, String msg){
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(msg)
+                .setNeutralButton("OK", null)
+                .show();
+    }
+
     public void onClick(View view){
         switch(view.getId()){
             case R.id.btnAdd:
@@ -116,15 +124,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void incrementTemperature(){
-        TargetTemperature += 0.1;
-        ThermostatData.putData("target_temperature", String.valueOf(TargetTemperature)); // the valueof bit finalizes the variable so it can be used from a separate thread.
-        this.RefreshData();
+        if(TargetTemperature < 30.0){
+            TargetTemperature += 0.1;
+            ThermostatData.putData("target_temperature", String.valueOf(TargetTemperature)); // the valueof bit finalizes the variable so it can be used from a separate thread.
+            this.RefreshData();
+        }else{
+            buildAlertWithOK("Temperature Error", "You can't increase the temperature past 30.0C.");
+        }
     }
 
     private void decrementTemperature(){
-        TargetTemperature -= 0.1;
-        ThermostatData.putData("target_temperature", String.valueOf(TargetTemperature)); // the valueof bit finalizes the variable so it can be used from a separate thread.
-        this.RefreshData();
+        if(TargetTemperature > 5.0){
+            TargetTemperature -= 0.1;
+            ThermostatData.putData("target_temperature", String.valueOf(TargetTemperature));
+            this.RefreshData();
+        }else{
+            buildAlertWithOK("Temperature Error", "You can't decrease the temperature below 5.0C.");
+        }
     }
 
     private void RefreshData(){
