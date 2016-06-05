@@ -2,6 +2,7 @@ package com.group09.hti_thermostat;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.SeekBar;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -35,11 +37,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
     // This can be requested to get *all* of the information stored in the web API.
     public static final String API_BASE_URL = "http://wwwis.win.tue.nl/2id40-ws/9";
     public static final String API_BACKUP_BASE_URL = "http://pcwin889.win.tue.nl/2id40-ws/9";
+    public static final int REFRESH_DELAY = 5000; // 5000 milliseconds, refresh the data from api every 5 seconds.
+    public static final double MIN_TEMPERATURE = 5.0;
+    public static final double MAX_TEMPERATURE = 30.0;
+    public static final double STEP = 0.5;
+    public static double SeekBarValue;
+
 
     public static double CurrentTemperature;
     public static double TargetTemperature;
@@ -56,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static Button btnPlus;
     public static Button btnWeeklyProgram;
     public static Switch switchWeeklyProgram;
+    public static SeekBar sbTemperature;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +76,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnPlus = (Button) findViewById(R.id.btnAdd);
         btnWeeklyProgram = (Button) findViewById(R.id.btnEditWeeklyProgram);
         switchWeeklyProgram = (Switch) findViewById(R.id.switchWeeklyEnabled);
+        sbTemperature = (SeekBar) findViewById(R.id.sbTemperature);
+        sbTemperature.setMax((int)((MAX_TEMPERATURE - MIN_TEMPERATURE) / STEP)); // 50. This is because, for whatever reason, you can't set the min.
+        sbTemperature.setOnSeekBarChangeListener(this);
         switchWeeklyProgram.setChecked(ThermostatData.week_program_state);
         if(switchWeeklyProgram.isChecked()) {
             btnWeeklyProgram.setEnabled(true);
@@ -78,10 +90,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnMinus.setOnClickListener(this);
         btnPlus.setOnClickListener(this);
         switchWeeklyProgram.setOnClickListener(this);
+        switchWeeklyProgram.setEnabled(ThermostatData.week_program_state);
         // This queue makes the request
         reqQueue = Volley.newRequestQueue(this);
         // StringRequest holds the initial request data
         this.RefreshData();
+
+        final Handler refreshHandler = new Handler();
+        refreshHandler.postDelayed(new Runnable(){
+            public void run(){
+                RefreshData();
+                refreshHandler.postDelayed(this, REFRESH_DELAY); // run forever every 5 seconds.
+            }
+        }, REFRESH_DELAY);
     }
 
 
@@ -114,12 +135,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(switchWeeklyProgram.isChecked()) {
                     btnWeeklyProgram.setEnabled(true);
                     btnWeeklyProgram.setAlpha(1.0f);
+                    ThermostatData.putData("week_program_state", "on");
                 }else {
                     btnWeeklyProgram.setEnabled(false);
                     btnWeeklyProgram.setAlpha(0.3f);
+                    ThermostatData.putData("week_program_state", "off");
                 }
                 break;
         }
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        this.TargetTemperature = SeekBarValue;
+        ThermostatData.putData("target_temperature", String.valueOf(TargetTemperature));
+        this.RefreshData();
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {}
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+    {
+        SeekBarValue = MIN_TEMPERATURE + (progress * STEP);
+        tvTemperature.setText(Double.toString(SeekBarValue));
     }
 
 
@@ -153,6 +193,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 tvTemperature.setText(TargetTemperature + "C");
                 tvCurrentTemperature.setText("Current Temperature: " + CurrentTemperature + "C");
                 switchWeeklyProgram.setChecked(ThermostatData.week_program_state);
+                int correctedTemperature = (int)((TargetTemperature - MIN_TEMPERATURE)/STEP);
+                Log.d("corrected temp", Integer.toString(correctedTemperature));
+                sbTemperature.setProgress(correctedTemperature); // convert back.
+                if(switchWeeklyProgram.isChecked()) {
+                    btnWeeklyProgram.setEnabled(true);
+                    btnWeeklyProgram.setAlpha(1.0f);
+                }else {
+                    btnWeeklyProgram.setEnabled(false);
+                    btnWeeklyProgram.setAlpha(0.3f);
+                }
             }
         }, new Response.ErrorListener(){
             @Override

@@ -16,7 +16,12 @@ public class GeneralHelper {
     }
 
     public static boolean onOffTextToBool(String text){
-        return (text == "on") ? true : false;
+        text = text.trim();
+        return text.equals("on");
+    }
+
+    public static String boolToOnOffText(boolean state){
+        return state ? "on" : "off";
     }
 
     public static String getSubUrlName(String attribute){

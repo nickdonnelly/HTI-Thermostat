@@ -38,9 +38,7 @@ public class XmlHandler {
                     }
                     String tagName = parser.getName();
                     // Send it to ThermostatData if it doesn't have a week program related tag
-                    if(!tagName.equals("week_program") && !tagName.equals("day")){
-                        ThermostatData.readThermostatData(parser, tagName);
-                    }
+                    ThermostatData.readThermostatData(parser, tagName);
                 }
             }catch (IOException e){
                 // TODO: Handle exception

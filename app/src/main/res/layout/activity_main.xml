@@ -11,7 +11,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="160dp"
+        android:layout_height="180dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:id="@+id/layoutTemperatureDisplay">
@@ -65,8 +65,8 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Current Temperature: 25.0C"
             android:id="@+id/tvCurrentTemperature"
-            android:layout_below="@+id/tvTemperature"
             android:textColor="#81D4FA"
+            android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true" />
 
         <TextView
@@ -79,6 +79,14 @@
             android:layout_above="@+id/btnSub"
             android:layout_margin="6dp"
             android:layout_centerHorizontal="true" />
+
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/sbTemperature"
+            android:layout_below="@+id/tvTemperature"
+            android:layout_centerHorizontal="true"
+            android:max="30" />
 
     </RelativeLayout>
 
