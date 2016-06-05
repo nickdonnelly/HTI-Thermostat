@@ -85,8 +85,20 @@
             android:layout_height="wrap_content"
             android:id="@+id/sbTemperature"
             android:layout_below="@+id/tvTemperature"
+            android:textColor="#81D4FA"
             android:layout_centerHorizontal="true"
             android:max="30" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Monday 00:00"
+            android:layout_marginBottom="5dp"
+            android:textColor="#81D4FA"
+            android:id="@+id/tvTimeDate"
+            android:layout_above="@+id/tvTemperature"
+            android:layout_centerHorizontal="true" />
 
     </RelativeLayout>
 

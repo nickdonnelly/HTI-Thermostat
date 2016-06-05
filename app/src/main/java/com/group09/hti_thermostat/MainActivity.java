@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // UI ELEMENTS
     public static TextView tvTemperature;
     public static TextView tvCurrentTemperature;
+    public static TextView tvTimeDate;
     public static Button btnMinus;
     public static Button btnPlus;
     public static Button btnWeeklyProgram;
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         tvTemperature = (TextView) findViewById(R.id.tvTemperature);
+        tvTimeDate = (TextView) findViewById(R.id.tvTimeDate);
         tvCurrentTemperature = (TextView) findViewById(R.id.tvCurrentTemperature);
         btnMinus = (Button) findViewById(R.id.btnSub);
         btnPlus = (Button) findViewById(R.id.btnAdd);
@@ -159,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
     {
         SeekBarValue = MIN_TEMPERATURE + (progress * STEP);
-        tvTemperature.setText(Double.toString(SeekBarValue));
+        tvTemperature.setText(Double.toString(SeekBarValue) + "C");
     }
 
 
@@ -193,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 tvTemperature.setText(TargetTemperature + "C");
                 tvCurrentTemperature.setText("Current Temperature: " + CurrentTemperature + "C");
                 switchWeeklyProgram.setChecked(ThermostatData.week_program_state);
+                tvTimeDate.setText(ThermostatData.current_day + " " + ThermostatData.time);
                 int correctedTemperature = (int)((TargetTemperature - MIN_TEMPERATURE)/STEP);
                 Log.d("corrected temp", Integer.toString(correctedTemperature));
                 sbTemperature.setProgress(correctedTemperature); // convert back.
