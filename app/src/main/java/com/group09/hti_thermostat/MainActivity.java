@@ -197,7 +197,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 switchWeeklyProgram.setChecked(ThermostatData.week_program_state);
                 tvTimeDate.setText(ThermostatData.current_day + " " + ThermostatData.time);
                 int correctedTemperature = (int)((TargetTemperature - MIN_TEMPERATURE)/STEP);
-                Log.d("corrected temp", Integer.toString(correctedTemperature));
                 sbTemperature.setProgress(correctedTemperature); // convert back.
                 if(switchWeeklyProgram.isChecked()) {
                     btnWeeklyProgram.setEnabled(true);
