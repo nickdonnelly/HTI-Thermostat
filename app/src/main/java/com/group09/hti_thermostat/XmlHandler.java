@@ -37,14 +37,22 @@ public class XmlHandler {
                         continue;
                     }
                     String tagName = parser.getName();
-                    // Send it to ThermostatData if it doesn't have a week program related tag
-                    ThermostatData.readThermostatData(parser, tagName);
+                    // Send it to ThermostatData for individual parsing.
+                    if(tagName.contains("week_program") && !tagName.equals("week_program_state")){
+                        ThermostatData.readWeekProgram(parser, tagName);
+                        break;
+                    }else if(tagName.equals("day")){
+                        ThermostatData.readThermostatDay(parser, tagName);
+                    }else{
+                        ThermostatData.readThermostatData(parser, tagName);
+                    }
                 }
             }catch (IOException e){
                 // TODO: Handle exception
             }
         }catch (XmlPullParserException e){
-            Log.e("Error: ", e.toString()); // log it
+            e.printStackTrace();
+            Log.e("Error", e.toString()); // log it
         }
         Log.i("XMLPARSE", "Done parsing!");
     }

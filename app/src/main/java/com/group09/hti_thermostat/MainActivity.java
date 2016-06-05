@@ -92,7 +92,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnMinus.setOnClickListener(this);
         btnPlus.setOnClickListener(this);
         switchWeeklyProgram.setOnClickListener(this);
-        switchWeeklyProgram.setEnabled(ThermostatData.week_program_state);
         // This queue makes the request
         reqQueue = Volley.newRequestQueue(this);
         // StringRequest holds the initial request data
