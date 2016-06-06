@@ -1,0 +1,62 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:layout_centerInParent="true">
+
+        <NumberPicker
+            android:id="@+id/npPrimary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/tvDecimal"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="."
+            android:id="@+id/tvDecimal"
+            android:textSize="36dp"
+            android:layout_alignBottom="@+id/npPrimary"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="60dp" />
+
+        <Button
+            android:id="@+id/btnTempSelectOK"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="OK"
+            android:background="@color/button_bg"
+            android:textColor="@color/button_text"
+            android:layout_below="@+id/npPrimary"
+            android:layout_marginTop="42dp" />
+
+
+        <NumberPicker
+            android:id="@+id/npDecimal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/tvDecimal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="C"
+            android:id="@+id/tvCLabel"
+            android:textSize="36dp"
+            android:layout_alignBottom="@+id/npPrimary"
+            android:layout_toRightOf="@+id/npDecimal"
+            android:layout_marginBottom="60dp" />
+    </RelativeLayout>
+
+
+</RelativeLayout>

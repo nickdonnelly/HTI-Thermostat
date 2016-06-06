@@ -1,13 +1,21 @@
 package com.group09.hti_thermostat;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.NumberPicker;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.SeekBar;
@@ -37,7 +45,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, NumberPicker.OnValueChangeListener {
 
     // This can be requested to get *all* of the information stored in the web API.
     public static final String API_BASE_URL = "http://wwwis.win.tue.nl/2id40-ws/9";
@@ -61,27 +69,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static TextView tvTemperature;
     public static TextView tvCurrentTemperature;
     public static TextView tvTimeDate;
+    public static TextView tvDayTemperature;
+    public static TextView tvNightTemperature;
     public static Button btnMinus;
     public static Button btnPlus;
     public static Button btnWeeklyProgram;
+    public static Button btnEditDay;
+    public static Button btnEditNight;
     public static Switch switchWeeklyProgram;
     public static SeekBar sbTemperature;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         tvTemperature = (TextView) findViewById(R.id.tvTemperature);
         tvTimeDate = (TextView) findViewById(R.id.tvTimeDate);
+        tvDayTemperature = (TextView) findViewById(R.id.tvDayTemp);
+        tvNightTemperature = (TextView) findViewById(R.id.tvNightTemp);
         tvCurrentTemperature = (TextView) findViewById(R.id.tvCurrentTemperature);
         btnMinus = (Button) findViewById(R.id.btnSub);
         btnPlus = (Button) findViewById(R.id.btnAdd);
         btnWeeklyProgram = (Button) findViewById(R.id.btnEditWeeklyProgram);
+        btnEditDay = (Button) findViewById(R.id.btnEditDayTemp);
+        btnEditNight = (Button) findViewById(R.id.btnEditNightTemp);
         switchWeeklyProgram = (Switch) findViewById(R.id.switchWeeklyEnabled);
+
+        switchWeeklyProgram.setChecked(ThermostatData.week_program_state);
         sbTemperature = (SeekBar) findViewById(R.id.sbTemperature);
         sbTemperature.setMax((int)((MAX_TEMPERATURE - MIN_TEMPERATURE) / STEP)); // 50. This is because, for whatever reason, you can't set the min.
         sbTemperature.setOnSeekBarChangeListener(this);
-        switchWeeklyProgram.setChecked(ThermostatData.week_program_state);
         if(switchWeeklyProgram.isChecked()) {
             btnWeeklyProgram.setEnabled(true);
             btnWeeklyProgram.setAlpha(1.0f);
@@ -91,6 +108,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         btnMinus.setOnClickListener(this);
         btnPlus.setOnClickListener(this);
+        btnEditDay.setOnClickListener(this);
+        btnEditNight.setOnClickListener(this);
         switchWeeklyProgram.setOnClickListener(this);
         // This queue makes the request
         reqQueue = Volley.newRequestQueue(this);
@@ -132,6 +151,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btnSub:
                 decrementTemperature();
                 break;
+            case R.id.btnEditDayTemp:
+                showDayDialog();
+                break;
+            case R.id.btnEditNightTemp:
+                showNightDialog();
+                break;
             case R.id.switchWeeklyEnabled:
                 if(switchWeeklyProgram.isChecked()) {
                     btnWeeklyProgram.setEnabled(true);
@@ -142,6 +167,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     btnWeeklyProgram.setAlpha(0.3f);
                     ThermostatData.putData("week_program_state", "off");
                 }
+                break;
+        }
+    }
+
+    @Override
+    public void onValueChange(NumberPicker picker, int prevVal, int newVal){
+        switch(picker.getId()){
+            case R.id.npPrimary:
+                if(newVal == 30){
+
+                }else if(prevVal == 30){
+
+                }
+                break;
+            case R.id.npDecimal:
                 break;
         }
     }
@@ -191,10 +231,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 XmlHandler.parseEntireDataset(httpResponse);
                 CurrentTemperature = Double.parseDouble(ThermostatData.current_temperature);
                 TargetTemperature = Double.parseDouble(ThermostatData.target_temperature);
+                DayTemperature = Double.parseDouble(ThermostatData.day_temperature);
+                NightTemperature = Double.parseDouble(ThermostatData.night_temperature);
                 tvTemperature.setText(TargetTemperature + "C");
                 tvCurrentTemperature.setText("Current Temperature: " + CurrentTemperature + "C");
                 switchWeeklyProgram.setChecked(ThermostatData.week_program_state);
                 tvTimeDate.setText(ThermostatData.current_day + " " + ThermostatData.time);
+                tvDayTemperature.setText(ThermostatData.day_temperature + "C");
+                tvNightTemperature.setText(ThermostatData.night_temperature + "C");
                 int correctedTemperature = (int)((TargetTemperature - MIN_TEMPERATURE)/STEP);
                 sbTemperature.setProgress(correctedTemperature); // convert back.
                 if(switchWeeklyProgram.isChecked()) {
@@ -212,6 +256,74 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         reqQueue.add(strReq);
+    }
+
+
+    private void showDayDialog(){
+        final Dialog d = new Dialog(this);
+        d.setTitle("Select Day Temperature");
+        d.setContentView(R.layout.npdialog);
+        Button okButton = (Button) d.findViewById(R.id.btnTempSelectOK);
+        final NumberPicker npPrimary = (NumberPicker) d.findViewById(R.id.npPrimary);
+        final NumberPicker npDecimal = (NumberPicker) d.findViewById(R.id.npDecimal);
+        npPrimary.setMinValue(5);
+        npPrimary.setMaxValue(30);
+        npDecimal.setMinValue(0);
+        npDecimal.setMaxValue(9);
+
+        npPrimary.setValue((int)Math.floor(this.DayTemperature));
+        int decVal = (int) ((DayTemperature - Math.floor(DayTemperature)) * 10);
+        npDecimal.setValue(decVal);
+
+        npPrimary.setOnValueChangedListener(this);
+        npDecimal.setOnValueChangedListener(this);
+
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Can't go above 30.0C
+                if(npPrimary.getValue() == 30){
+                    ThermostatData.putData("day_temperature", String.valueOf(npPrimary.getValue()) + ".0");
+                }else{
+                    ThermostatData.putData("day_temperature", String.valueOf(npPrimary.getValue()) + "." + String.valueOf(npDecimal.getValue()));
+                }
+                d.dismiss();
+            }
+        });
+        d.show();
+    }
+
+    private void showNightDialog(){
+        final Dialog d = new Dialog(this);
+        d.setTitle("Select Night Temperature");
+        d.setContentView(R.layout.npdialog);
+        Button okButton = (Button) d.findViewById(R.id.btnTempSelectOK);
+        final NumberPicker npPrimary = (NumberPicker) d.findViewById(R.id.npPrimary);
+        final NumberPicker npDecimal = (NumberPicker) d.findViewById(R.id.npDecimal);
+        npPrimary.setMinValue(5);
+        npPrimary.setMaxValue(30);
+        npDecimal.setMinValue(0);
+        npDecimal.setMaxValue(9);
+
+        npPrimary.setOnValueChangedListener(this);
+        npDecimal.setOnValueChangedListener(this);
+
+        npPrimary.setValue((int)Math.floor(NightTemperature));
+        int decVal = (int) ((NightTemperature - Math.floor(NightTemperature)) * 10);
+        npDecimal.setValue(decVal);
+
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(npPrimary.getValue() == 30){
+                    ThermostatData.putData("night_temperature", String.valueOf(npPrimary.getValue()) + ".0");
+                }else{
+                    ThermostatData.putData("night_temperature", String.valueOf(npPrimary.getValue()) + "." + String.valueOf(npDecimal.getValue()));
+                }
+                d.dismiss();
+            }
+        });
+        d.show();
     }
 
 }

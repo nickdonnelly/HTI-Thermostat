@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">Thermostat</string>
     <string name="weekly_enabled_card">Would you like to enable the weekly program? Turning this setting off will ignore all scheduled temperature changes.</string>
+    <string name="day_temp_label">Day Temperature</string>
+    <string name="night_temp_label">Night Temperature</string>
 </resources>

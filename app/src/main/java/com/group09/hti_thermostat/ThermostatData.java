@@ -73,7 +73,6 @@ public class ThermostatData {
                 switch_types[day_id][i] = switch_type;
             }
         }
-        Log.d("READTHERM", "WE DONE");
     }
 
     public static void readThermostatData(XmlPullParser parser, String type) throws IOException, XmlPullParserException{

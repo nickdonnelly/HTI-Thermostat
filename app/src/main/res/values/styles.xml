@@ -9,6 +9,7 @@
         <item name="android:windowBackground">@color/navigationBarColor</item>
         <item name="android:navigationBarColor">@color/navigationBarColor</item>
         <item name="android:statusBarColor">@color/navigationBarColor</item>
+        <item name="android:textColorPrimary">#ffffff</item>
     </style>
 
 </resources>

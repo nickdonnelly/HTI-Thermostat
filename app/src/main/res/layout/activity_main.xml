@@ -154,5 +154,96 @@
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 
+    <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/cvDayNightTemps"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:background="@color/colorPrimaryDark"
+        card_view:cardCornerRadius="1dp"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/cvWeeklyProgramEnabled"
+        android:layout_alignParentEnd="true">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimaryDark"
+            android:padding="10dp">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/day_temp_label"
+                android:id="@+id/tvDayTempLabel"
+                android:textColor="@android:color/white"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="13dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/night_temp_label"
+                android:id="@+id/tvNightTempLabel"
+                android:textColor="@android:color/white"
+                android:layout_alignParentBottom="true"
+                android:layout_alignStart="@+id/tvDayTempLabel" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="25.0C"
+                android:id="@+id/tvDayTemp"
+                android:layout_marginStart="15dp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:layout_alignTop="@+id/tvDayTempLabel"
+                android:layout_toEndOf="@+id/tvNightTempLabel" />
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="80dp"
+                android:layout_height="35dp"
+                android:text="Edit"
+                android:id="@+id/btnEditDayTemp"
+                android:background="@color/button_bg"
+                android:textColor="@color/button_text"
+                android:padding="10dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignBaseline="@+id/tvDayTemp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="25.0C"
+                android:id="@+id/tvNightTemp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:layout_alignParentBottom="true"
+                android:layout_alignStart="@+id/tvDayTemp" />
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="80dp"
+                android:layout_height="35dp"
+                android:text="Edit"
+                android:id="@+id/btnEditNightTemp"
+                android:background="@color/button_bg"
+                android:textColor="@color/button_text"
+                android:padding="10dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignBaseline="@+id/tvNightTemp" />
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
 
 </RelativeLayout>
