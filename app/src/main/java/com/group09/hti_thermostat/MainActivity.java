@@ -111,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnEditDay.setOnClickListener(this);
         btnEditNight.setOnClickListener(this);
         switchWeeklyProgram.setOnClickListener(this);
+        Log.d("test", "test123");
         // This queue makes the request
         reqQueue = Volley.newRequestQueue(this);
         // StringRequest holds the initial request data
