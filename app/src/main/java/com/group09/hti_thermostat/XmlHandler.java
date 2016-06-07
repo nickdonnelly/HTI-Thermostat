@@ -61,4 +61,8 @@ public class XmlHandler {
         return "<" + tagname + ">" + value + "</" + tagname + ">";
     }
 
+    public static void putWeekProgram(){
+        // TODO
+    }
+
 }

@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // This can be requested to get *all* of the information stored in the web API.
     public static final String API_BASE_URL = "http://wwwis.win.tue.nl/2id40-ws/9";
     public static final String API_BACKUP_BASE_URL = "http://pcwin889.win.tue.nl/2id40-ws/9";
-    public static final int REFRESH_DELAY = 5000; // 5000 milliseconds, refresh the data from api every 5 seconds.
+    public static final int REFRESH_DELAY = 1000; // 5000 milliseconds, refresh the data from api every 5 seconds.
     public static final double MIN_TEMPERATURE = 5.0;
     public static final double MAX_TEMPERATURE = 30.0;
     public static final double STEP = 0.5;
@@ -240,7 +240,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 tvDayTemperature.setText(ThermostatData.day_temperature + "C");
                 tvNightTemperature.setText(ThermostatData.night_temperature + "C");
                 int correctedTemperature = (int)((TargetTemperature - MIN_TEMPERATURE)/STEP);
-                sbTemperature.setProgress(correctedTemperature); // convert back.
+                if(TargetTemperature % 0.5 == 0){
+                    sbTemperature.setProgress(correctedTemperature); // convert back.
+                }
                 if(switchWeeklyProgram.isChecked()) {
                     btnWeeklyProgram.setEnabled(true);
                     btnWeeklyProgram.setAlpha(1.0f);
