@@ -3,6 +3,7 @@ package com.group09.hti_thermostat;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Handler;
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // This can be requested to get *all* of the information stored in the web API.
     public static final String API_BASE_URL = "http://wwwis.win.tue.nl/2id40-ws/9";
     public static final String API_BACKUP_BASE_URL = "http://pcwin889.win.tue.nl/2id40-ws/9";
-    public static final int REFRESH_DELAY = 1000; // 5000 milliseconds, refresh the data from api every 5 seconds.
+    public static final int REFRESH_DELAY = 2000; // 5000 milliseconds, refresh the data from api every 5 seconds.
     public static final double MIN_TEMPERATURE = 5.0;
     public static final double MAX_TEMPERATURE = 30.0;
     public static final double STEP = 0.5;
@@ -110,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnPlus.setOnClickListener(this);
         btnEditDay.setOnClickListener(this);
         btnEditNight.setOnClickListener(this);
+        btnWeeklyProgram.setOnClickListener(this);
         switchWeeklyProgram.setOnClickListener(this);
         Log.d("test", "test123");
         // This queue makes the request
@@ -151,6 +153,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btnSub:
                 decrementTemperature();
+                break;
+            case R.id.btnEditWeeklyProgram:
+                Intent weekIntent = new Intent(this, WeekProgramActivity.class);
+                startActivity(weekIntent);
                 break;
             case R.id.btnEditDayTemp:
                 showDayDialog();
@@ -200,8 +206,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
     {
-        SeekBarValue = MIN_TEMPERATURE + (progress * STEP);
-        tvTemperature.setText(Double.toString(SeekBarValue) + "C");
+        if(fromUser){
+            SeekBarValue = MIN_TEMPERATURE + (progress * STEP);
+            tvTemperature.setText(Double.toString(SeekBarValue) + "C");
+        }
     }
 
 
@@ -234,14 +242,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 TargetTemperature = Double.parseDouble(ThermostatData.target_temperature);
                 DayTemperature = Double.parseDouble(ThermostatData.day_temperature);
                 NightTemperature = Double.parseDouble(ThermostatData.night_temperature);
-                tvTemperature.setText(TargetTemperature + "C");
+                if(!sbTemperature.isPressed()){
+                    tvTemperature.setText(TargetTemperature + "C");
+                }
                 tvCurrentTemperature.setText("Current Temperature: " + CurrentTemperature + "C");
                 switchWeeklyProgram.setChecked(ThermostatData.week_program_state);
                 tvTimeDate.setText(ThermostatData.current_day + " " + ThermostatData.time);
                 tvDayTemperature.setText(ThermostatData.day_temperature + "C");
                 tvNightTemperature.setText(ThermostatData.night_temperature + "C");
                 int correctedTemperature = (int)((TargetTemperature - MIN_TEMPERATURE)/STEP);
-                if(TargetTemperature % 0.5 == 0){
+                if(!sbTemperature.isPressed()){
                     sbTemperature.setProgress(correctedTemperature); // convert back.
                 }
                 if(switchWeeklyProgram.isChecked()) {
