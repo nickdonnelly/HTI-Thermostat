@@ -12,4 +12,5 @@
     tools:context="com.group09.hti_thermostat.WeekProgramActivity"
     tools:showIn="@layout/activity_week_program">
 
+
 </RelativeLayout>
