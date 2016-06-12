@@ -36,13 +36,12 @@ public class XmlHandler {
                     if(parser.getEventType() != XmlPullParser.START_TAG){
                         continue;
                     }
+                    if(parser.getEventType() == XmlPullParser.END_DOCUMENT) break;
                     String tagName = parser.getName();
                     // Send it to ThermostatData for individual parsing.
                     if(tagName.contains("week_program") && !tagName.equals("week_program_state")){
-                        ThermostatData.readWeekProgram(parser, tagName);
-                        break;
-                    }else if(tagName.equals("day")){
                         ThermostatData.readThermostatDay(parser, tagName);
+                        break;
                     }else{
                         ThermostatData.readThermostatData(parser, tagName);
                     }

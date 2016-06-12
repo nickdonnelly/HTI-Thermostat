@@ -14,7 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ScrollView;
 
-public class WeekProgramActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, View.OnClickListener {
+public class WeekProgramActivity extends AppCompatActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {
 
     private int DAY_ID = 0; // Start it on monday
     private String DAY_NAME = "Monday";
@@ -53,29 +53,29 @@ public class WeekProgramActivity extends AppCompatActivity implements TabLayout.
     }
 
     @Override
-    public void onTabSelected(TabLayout.Tab tab) {
-        this.DAY_NAME = String.valueOf(tab.getText());
-        this.DAY_ID = GeneralHelper.getDayIdFromString(this.DAY_NAME);
-        getSupportActionBar().setTitle("Week Program: " + this.DAY_NAME); // update title
-        Log.d("TAB SELECTED", this.DAY_NAME);
-    }
-
-    @Override
-    public void onTabUnselected(TabLayout.Tab tab) {
-
-    }
-
-    @Override
-    public void onTabReselected(TabLayout.Tab tab) {
-
-    }
-
-    @Override
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.fab:
                 Log.d("CLICK EVENT", "Floating action button");
                 break;
         }
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        this.DAY_NAME = String.valueOf(ThermostatData.days[position - 1]);
+        this.DAY_ID = GeneralHelper.getDayIdFromString(this.DAY_NAME);
+        getSupportActionBar().setTitle("Week Program: " + this.DAY_NAME); // update title
+
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
     }
 }

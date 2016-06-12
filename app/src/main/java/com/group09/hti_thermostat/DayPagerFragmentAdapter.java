@@ -13,6 +13,7 @@ public class DayPagerFragmentAdapter extends FragmentPagerAdapter {
     public DayPagerFragmentAdapter(FragmentManager fm, Context context) {
         super(fm);
         this.context = context;
+
     }
 
     @Override

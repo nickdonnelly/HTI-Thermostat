@@ -46,33 +46,58 @@ public class ThermostatData {
     }
 
     public static void readThermostatDay(XmlPullParser parser, String type) throws IOException, XmlPullParserException{
-        Log.d("READTHERM", "readThermostatDay Called");
         switches = new String[7][10];
         switch_types = new String[7][10];
         for(String[] row : switches){
             Arrays.fill(row, "00:00"); // fill everything with default "00:00"
         }
         switch_states = new boolean[7][10]; // these automatically default to false.
-        for(int k = 0; k < 7; k++){
+        parser.nextTag();
+        for(int i = 0; i < 7; i++) {
             int day_id = GeneralHelper.getDayIdFromString(parser.getAttributeValue(null, "name"));
-            parser.nextTag(); // move to first switch.
-            for(int i = 0; i < 10; i++){
-                boolean switch_state = GeneralHelper.onOffTextToBool(String.valueOf(parser.getAttributeValue(null, "state")));
+            parser.nextTag();
+            for(int k = 0; k < 10; k++){
                 String switch_type = parser.getAttributeValue(null, "type");
-                parser.next(); // Move to the text.
+                boolean switch_enabled = GeneralHelper.onOffTextToBool(parser.getAttributeValue(null, "state"));
+                parser.next(); // move to text
                 String switch_time = parser.getText();
+                switches[day_id][k] = switch_time;
+                switch_states[day_id][k] = switch_enabled;
+                switch_types[day_id][k] = switch_type;
+
                 while(parser.getEventType() != XmlPullParser.START_TAG){
+                    parser.next();
                     if(parser.getEventType() == XmlPullParser.END_DOCUMENT){
                         break;
                     }
-                    parser.next();
                 }
-                // Save this data
-                switches[day_id][i] = switch_time;
-                switch_states[day_id][i] = switch_state;
-                switch_types[day_id][i] = switch_type;
+
             }
         }
+//            Log.d("Day Name is", days[day_id]);
+
+//        }
+//        for(int k = 0; k < 7; k++){
+//            int day_id = GeneralHelper.getDayIdFromString(parser.getAttributeValue(null, "name"));
+//            Log.d("The type is ", String.valueOf(parser.getEventType()));
+//            if(parser.getEventType() != XmlPullParser.TEXT) parser.nextTag(); // move to first switch.
+//            for(int i = 0; i < 10; i++){
+//                boolean switch_state = GeneralHelper.onOffTextToBool(String.valueOf(parser.getAttributeValue(null, "state")));
+//                String switch_type = parser.getAttributeValue(null, "type");
+//                parser.next(); // Move to the text.
+//                String switch_time = parser.getText();
+//                while(parser.getEventType() != XmlPullParser.START_TAG){
+//                    if(parser.getEventType() == XmlPullParser.END_DOCUMENT){
+//                        break;
+//                    }
+//                    parser.next();
+//                }
+//                // Save this data
+//                switches[day_id][i] = switch_time;
+//                switch_states[day_id][i] = switch_state;
+//                switch_types[day_id][i] = switch_type;
+//            }
+//        }
     }
 
     public static void readThermostatData(XmlPullParser parser, String type) throws IOException, XmlPullParserException{

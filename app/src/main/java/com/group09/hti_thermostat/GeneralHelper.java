@@ -25,6 +25,7 @@ public class GeneralHelper {
     }
 
     public static int getDayIdFromString(String dayName) {
+        if(dayName == null) return 0;
         switch (dayName) {
             case "Monday":
                 return 0;
