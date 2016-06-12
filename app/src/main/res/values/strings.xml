@@ -4,4 +4,10 @@
     <string name="day_temp_label">Day Temperature</string>
     <string name="night_temp_label">Night Temperature</string>
     <string name="title_activity_week_program">Week Program</string>
+    <string name="title_activity_test_tabs">TestTabsActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
