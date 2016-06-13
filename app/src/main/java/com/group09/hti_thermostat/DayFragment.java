@@ -1,5 +1,6 @@
 package com.group09.hti_thermostat;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,10 +10,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.NumberPicker;
 import android.widget.ScrollView;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +32,7 @@ import java.util.Arrays;
  * Use the {@link DayFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DayFragment extends Fragment {
+public class DayFragment extends Fragment implements ListView.OnItemClickListener {
     private static final String ARG_PAGE = "ARG_PAGE";
 
     private int mPage;
@@ -43,6 +49,7 @@ public class DayFragment extends Fragment {
     public static ListView lvDay;
 
     private ArrayAdapter<String> listAdapter;
+    ArrayList<String> lItems;
 
     public DayFragment() {
         // Required empty public constructor
@@ -73,23 +80,90 @@ public class DayFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-//        tvTest = (TextView) this.findViewById(R.id.textViewTest);
         View view = inflater.inflate(R.layout.fragment_day, container, false);
-//        tvTest = (TextView) view;
-//        tvTest.setText("This is page" + String.valueOf(this.mPage));
         lvDay = (ListView) view;
-        ArrayList<String> lItems = new ArrayList<String>();
-        lItems.addAll(Arrays.asList(day_switches));
+        lvDay.setOnItemClickListener(this);
+
+        lItems = new ArrayList<String>();
+        for(int i = 0; i < day_switches.length; i++){
+            if(day_switch_enabled[i]){
+                lItems.add("Switch to " + day_switch_types[i] + " temperature\nat " + day_switches[i]); // add it
+            }
+        }
         listAdapter = new ArrayAdapter<String>(this.getActivity(), R.layout.sample_day_row_view, R.id.tvSwitchTitle);
         listAdapter.addAll(lItems);
         lvDay.setAdapter(listAdapter);
         return view;
     }
 
-    public void onButtonPressed(Uri uri) {
-//        if (mListener != null) {
-//            mListener.onFragmentInteraction(uri);
-//        }
+    public void onButtonPressed(Uri uri) {}
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        final int pos = position;
+        TextView entry = (TextView) lvDay.getChildAt(position).findViewById(R.id.tvSwitchTitle);
+        String text = String.valueOf(entry.getText());
+        String type = getTypeFromText(text);
+        String time = text.substring(text.length() - 5, text.length());
+
+        final Dialog d = new Dialog(this.getActivity());
+        d.setTitle("Edit Switch");
+        d.setContentView(R.layout.switch_edit);
+        final Switch swDayNight = (Switch) d.findViewById(R.id.swDayNight);
+        if(type == "day"){
+            swDayNight.setChecked(false);
+        }else{
+            swDayNight.setChecked(true);
+        }
+        final TimePicker picker = (TimePicker) d.findViewById(R.id.timePicker);
+        Button btnSave = (Button) d.findViewById(R.id.btnSave);
+        Button btnDelete = (Button) d.findViewById(R.id.btnDelete);
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                lItems.remove(pos); // remove from raw set
+                listAdapter.clear();
+                listAdapter.addAll(lItems);
+                listAdapter.notifyDataSetChanged();
+                d.dismiss();
+                updateAndSaveSchedule();
+            }
+        });
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String strTime = String.valueOf(picker.getHour()) + ":" + String.valueOf(picker.getMinute());
+                String type = (swDayNight.isChecked()) ? "night" : "day";
+                String item = "Switch to " + type + " temperature\nat " + strTime;
+
+                lItems.set(pos, item);
+                listAdapter.clear();
+                listAdapter.addAll(lItems);
+                listAdapter.notifyDataSetChanged();
+                updateAndSaveSchedule();
+                d.dismiss();
+            }
+        });
+        picker.setIs24HourView(true);
+        picker.setHour(Integer.parseInt(time.split(":")[0])); // parse left of :
+        picker.setMinute(Integer.parseInt(time.split(":")[1])); // parse right of :
+
+
+        d.show();
+    }
+
+    public static String getTypeFromText(String text){
+        if(text.toLowerCase().contains("day")){
+            return "day";
+        }else if(text.toLowerCase().contains("night")){
+            return "night";
+        }else{
+            return "Unknown switch";
+        }
+    }
+
+    private void updateAndSaveSchedule(){
+        //TODO: this should update the arrays and call an api save.
     }
 
     /**
