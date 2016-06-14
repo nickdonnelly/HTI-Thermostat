@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.util.Log;
@@ -117,6 +118,10 @@ public class DayFragment extends Fragment implements ListView.OnItemClickListene
         }
         if(!fiveOfEither().equals(type) && fiveOfEither() != "neither"  ){
             swDayNight.setEnabled(false); // don't let them change.
+
+            //TODO MAKE THIS WORK
+            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
         }
         final TimePicker picker = (TimePicker) d.findViewById(R.id.timePicker);
         Button btnSave = (Button) d.findViewById(R.id.btnSave);
