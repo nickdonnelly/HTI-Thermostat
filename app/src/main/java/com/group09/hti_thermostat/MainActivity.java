@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         new AlertDialog.Builder(this)
                 .setTitle(title)
                 .setMessage(msg)
-                .show();
+                .show().getWindow().setBackgroundDrawableResource(android.R.color.holo_blue_dark);
     }
 
     private void buildAlertWithOK(String title, String msg){
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setTitle(title)
                 .setMessage(msg)
                 .setNeutralButton("OK", null)
-                .show();
+                .show().getWindow().setBackgroundDrawableResource(android.R.color.holo_blue_dark);
     }
 
     public void onClick(View view){

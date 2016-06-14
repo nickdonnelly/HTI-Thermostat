@@ -14,15 +14,20 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ScrollView;
 
-public class WeekProgramActivity extends AppCompatActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {
+import java.util.Arrays;
+
+public class WeekProgramActivity extends AppCompatActivity implements View.OnClickListener {
 
     private int DAY_ID = 0; // Start it on monday
-    private String DAY_NAME = "Monday";
 
     // UI Elements
     public static ScrollView svSingleDay;
     public static TabLayout tlDays;
     public static ViewPager vpSchedule;
+
+    public static String[][] cp_switches;
+    public static String[][] cp_switch_types;
+    public static boolean[][] cp_switch_states;
 
 
     @Override
@@ -32,24 +37,29 @@ public class WeekProgramActivity extends AppCompatActivity implements View.OnCli
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        svSingleDay = (ScrollView) findViewById(R.id.svSingleDaySchedule);
         vpSchedule = (ViewPager) findViewById(R.id.vpSchedule);
         vpSchedule.setAdapter(new DayPagerFragmentAdapter(getSupportFragmentManager(), WeekProgramActivity.this));
         tlDays = (TabLayout) findViewById(R.id.tabLayoutWeek);
         tlDays.setupWithViewPager(vpSchedule);
-//        tlDays.setOnTabSelectedListener(this);
         tlDays.setTabTextColors(Color.LTGRAY, Color.WHITE);
-
-//        tlDays.setupWithViewPager();
         fab.setOnClickListener(this);
-        //@Override
-        //public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                  Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
-        //  }
-        //});
+
+        cp_switches = new String[7][10];
+        cp_switch_types = new String[7][10];
+        cp_switch_states = new boolean[7][10];
+
+        for(int i = 0; i < 7; i++){
+
+            // Copy these from the data so they don't get overwritten every time the API refreshes.
+            cp_switches[i] = Arrays.copyOf(ThermostatData.switches[i], 10);
+            cp_switch_types[i] = Arrays.copyOf(ThermostatData.switch_types[i], 10);
+            cp_switch_states[i] = Arrays.copyOf(ThermostatData.switch_states[i], 10);
+        }
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Week Program: " + DAY_NAME);
+        getSupportActionBar().setTitle("Week Program");
     }
 
     @Override
@@ -61,21 +71,4 @@ public class WeekProgramActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-    }
-
-    @Override
-    public void onPageSelected(int position) {
-        this.DAY_NAME = String.valueOf(ThermostatData.days[position - 1]);
-        this.DAY_ID = GeneralHelper.getDayIdFromString(this.DAY_NAME);
-        getSupportActionBar().setTitle("Week Program: " + this.DAY_NAME); // update title
-
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-
-    }
 }

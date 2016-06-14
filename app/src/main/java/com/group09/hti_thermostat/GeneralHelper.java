@@ -61,4 +61,18 @@ public class GeneralHelper {
                 return "";
         }
     }
+
+    public static String correctTime(String time){
+        int hour = Integer.parseInt(time.split(":")[0]);
+        int minute = Integer.parseInt(time.split(":")[1]);
+        String strHour = String.valueOf(hour);
+        String strMin = String.valueOf(minute);
+        if(hour < 10){
+            strHour = "0" + String.valueOf(hour);
+        }
+        if(minute < 10){
+            strMin = "0" + String.valueOf(minute);
+        }
+        return strHour + ":" + strMin;
+    }
 }

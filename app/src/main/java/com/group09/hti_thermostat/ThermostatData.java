@@ -158,4 +158,50 @@ public class ThermostatData {
             }
         }).start();
     }
+
+    private static String getXmlSwitchString(String time, String type, boolean enabled){
+        return "<switch type=\"" + type + "\" state=\"" + GeneralHelper.boolToOnOffText(enabled) + "\">" + time + "</switch>";
+    }
+
+
+    // It is expected the size of each of these arrays be [7][10].
+    public static void putWeekProgram(final String[][] sw, final String[][] sw_types, final boolean[][] sw_enabled){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    String xmlStr = "<week_program state=\"on\">"; // this should only get called if the program is on anyway.
+                    for(int i = 0; i < 7; i++){ // each day
+                        xmlStr += "<day name=\"" + days[i] + "\">";
+
+                        for(int k = 0; k < 10; k++){ // each switch
+                            xmlStr += getXmlSwitchString(sw[i][k], sw_types[i][k], sw_enabled[i][k]);
+                        }
+
+                        xmlStr += "</day>";
+                    }
+                    URL link = new URL(MainActivity.API_BASE_URL + "/weekProgram");
+                    HttpURLConnection request = (HttpURLConnection) link.openConnection();
+                    request.setReadTimeout(10000); // 10 seconds of timeout.
+                    request.setConnectTimeout(10000);
+                    request.setRequestProperty("Content-Type", "application/xml"); // you get HTTP 414 if you don't do this.
+                    request.setRequestMethod("PUT"); // PUTting data, not asking for response
+                    request.setDoInput(false);
+                    request.setDoOutput(true);
+                    request.connect();
+
+                    DataOutputStream putData = new DataOutputStream(request.getOutputStream());
+                    // write the data to putData
+                    putData.writeBytes(xmlStr);
+                    putData.flush();
+                    int code = request.getResponseCode();
+                    Log.i("API Responded", Integer.toString(code));
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+
+
+            }
+        }).start();
+    }
 }

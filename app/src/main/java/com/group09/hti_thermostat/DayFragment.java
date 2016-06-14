@@ -71,9 +71,9 @@ public class DayFragment extends Fragment implements ListView.OnItemClickListene
         this.DAY_NAME = ThermostatData.days[DAY_ID];
 
         // Make local copies of this so that the GET requests do not overwrite impending changes.
-        day_switches = Arrays.copyOf(ThermostatData.switches[DAY_ID], 10);
-        day_switch_enabled = Arrays.copyOf(ThermostatData.switch_states[DAY_ID], 10);
-        day_switch_types = Arrays.copyOf(ThermostatData.switch_types[DAY_ID], 10);
+        day_switches = Arrays.copyOf(WeekProgramActivity.cp_switches[DAY_ID], 10);
+        day_switch_enabled = Arrays.copyOf(WeekProgramActivity.cp_switch_states[DAY_ID], 10);
+        day_switch_types = Arrays.copyOf(WeekProgramActivity.cp_switch_types[DAY_ID], 10);
     }
 
     @Override
@@ -101,8 +101,8 @@ public class DayFragment extends Fragment implements ListView.OnItemClickListene
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         final int pos = position;
-        TextView entry = (TextView) lvDay.getChildAt(position).findViewById(R.id.tvSwitchTitle);
-        String text = String.valueOf(entry.getText());
+
+        String text = String.valueOf(lvDay.getItemAtPosition(position));
         String type = getTypeFromText(text);
         String time = text.substring(text.length() - 5, text.length());
 
@@ -110,10 +110,13 @@ public class DayFragment extends Fragment implements ListView.OnItemClickListene
         d.setTitle("Edit Switch");
         d.setContentView(R.layout.switch_edit);
         final Switch swDayNight = (Switch) d.findViewById(R.id.swDayNight);
-        if(type == "day"){
+        if(type.equals("day")){
             swDayNight.setChecked(false);
         }else{
             swDayNight.setChecked(true);
+        }
+        if(!fiveOfEither().equals(type) && fiveOfEither() != "neither"  ){
+            swDayNight.setEnabled(false); // don't let them change.
         }
         final TimePicker picker = (TimePicker) d.findViewById(R.id.timePicker);
         Button btnSave = (Button) d.findViewById(R.id.btnSave);
@@ -134,7 +137,7 @@ public class DayFragment extends Fragment implements ListView.OnItemClickListene
             public void onClick(View v) {
                 String strTime = String.valueOf(picker.getHour()) + ":" + String.valueOf(picker.getMinute());
                 String type = (swDayNight.isChecked()) ? "night" : "day";
-                String item = "Switch to " + type + " temperature\nat " + strTime;
+                String item = "Switch to " + type + " temperature\nat " + GeneralHelper.correctTime(strTime);
 
                 lItems.set(pos, item);
                 listAdapter.clear();
@@ -164,6 +167,35 @@ public class DayFragment extends Fragment implements ListView.OnItemClickListene
 
     private void updateAndSaveSchedule(){
         //TODO: this should update the arrays and call an api save.
+        Arrays.fill(day_switch_enabled, false); // disable them all and only enable the ones we use.
+        Arrays.fill(day_switches, "00:00");
+        Arrays.fill(day_switch_types, "night");
+        Arrays.fill(day_switch_types, 0, 4, "day");
+        for(int i = 0; i < lItems.size(); i++){
+            day_switches[i] = getTimeFromItem(lItems.get(i));
+            day_switch_types[i] = getTypeFromText(lItems.get(i));
+            day_switch_enabled[i] = true;
+        }
+    }
+
+    private String fiveOfEither(){
+        int nightCount = 0, dayCount = 0;
+
+        for(int i = 0; i < lItems.size(); i++){
+            if(lItems.get(i).toLowerCase().contains("day")){
+                dayCount++;
+            }else{
+                nightCount++;
+            }
+        }
+
+        if(nightCount == 5) return "night";
+        if(dayCount == 5) return "day";
+        return "neither";
+    }
+
+    private String getTimeFromItem(String item){
+        return item.substring(item.length() - 5, item.length()).trim();
     }
 
     /**
