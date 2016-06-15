@@ -47,7 +47,7 @@ public class DayFragment extends Fragment implements ListView.OnItemClickListene
 
     private OnFragmentInteractionListener mListener;
 
-    public static ListView lvDay;
+    public ListView lvDay;
 
     private ArrayAdapter<String> listAdapter;
     ArrayList<String> lItems;
@@ -102,9 +102,9 @@ public class DayFragment extends Fragment implements ListView.OnItemClickListene
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         final int pos = position;
-
+        final View fView = view;
         String text = String.valueOf(lvDay.getItemAtPosition(position));
-        String type = getTypeFromText(text);
+        final String type = getTypeFromText(text);
         String time = text.substring(text.length() - 5, text.length());
 
         final Dialog d = new Dialog(this.getActivity());
@@ -115,13 +115,6 @@ public class DayFragment extends Fragment implements ListView.OnItemClickListene
             swDayNight.setChecked(false);
         }else{
             swDayNight.setChecked(true);
-        }
-        if(!fiveOfEither().equals(type) && fiveOfEither() != "neither"  ){
-            swDayNight.setEnabled(false); // don't let them change.
-
-            //TODO MAKE THIS WORK
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
         }
         final TimePicker picker = (TimePicker) d.findViewById(R.id.timePicker);
         Button btnSave = (Button) d.findViewById(R.id.btnSave);
@@ -141,8 +134,19 @@ public class DayFragment extends Fragment implements ListView.OnItemClickListene
             @Override
             public void onClick(View v) {
                 String strTime = String.valueOf(picker.getHour()) + ":" + String.valueOf(picker.getMinute());
-                String type = (swDayNight.isChecked()) ? "night" : "day";
-                String item = "Switch to " + type + " temperature\nat " + GeneralHelper.correctTime(strTime);
+                String swType;
+                if(!fiveOfEither().equals(type) && fiveOfEither() != "neither"){
+                    swType = type;
+                    if((swDayNight.isChecked() ? "night" : "day")!= type){
+                        Snackbar.make(fView, "Failed to save: Only 5 switches of each type allowed!", Snackbar.LENGTH_LONG)
+                                .setAction("", null).show();
+                        d.dismiss();
+                        return;
+                    }
+                }else{
+                    swType = (swDayNight.isChecked()) ? "night" : "day";
+                }
+                String item = "Switch to " + swType + " temperature\nat " + GeneralHelper.correctTime(strTime);
 
                 lItems.set(pos, item);
                 listAdapter.clear();
@@ -155,7 +159,6 @@ public class DayFragment extends Fragment implements ListView.OnItemClickListene
         picker.setIs24HourView(true);
         picker.setHour(Integer.parseInt(time.split(":")[0])); // parse left of :
         picker.setMinute(Integer.parseInt(time.split(":")[1])); // parse right of :
-
 
         d.show();
     }
