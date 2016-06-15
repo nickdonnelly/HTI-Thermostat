@@ -180,6 +180,9 @@ public class ThermostatData {
 
                         xmlStr += "</day>";
                     }
+
+                    xmlStr += "</week_program>";
+
                     URL link = new URL(MainActivity.API_BASE_URL + "/weekProgram");
                     HttpURLConnection request = (HttpURLConnection) link.openConnection();
                     request.setReadTimeout(10000); // 10 seconds of timeout.

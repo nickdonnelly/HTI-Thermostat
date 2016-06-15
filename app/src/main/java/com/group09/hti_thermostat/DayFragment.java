@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
@@ -33,10 +34,12 @@ import java.util.Arrays;
  * Use the {@link DayFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DayFragment extends Fragment implements ListView.OnItemClickListener {
+public class DayFragment extends Fragment implements ListView.OnItemClickListener, View.OnClickListener {
     private static final String ARG_PAGE = "ARG_PAGE";
 
     private int mPage;
+
+
 
     private int DAY_ID;
     private String DAY_NAME;
@@ -48,6 +51,7 @@ public class DayFragment extends Fragment implements ListView.OnItemClickListene
     private OnFragmentInteractionListener mListener;
 
     public ListView lvDay;
+    public FloatingActionButton fabDay;
 
     private ArrayAdapter<String> listAdapter;
     ArrayList<String> lItems;
@@ -72,6 +76,7 @@ public class DayFragment extends Fragment implements ListView.OnItemClickListene
         this.DAY_NAME = ThermostatData.days[DAY_ID];
 
         // Make local copies of this so that the GET requests do not overwrite impending changes.
+
         day_switches = Arrays.copyOf(WeekProgramActivity.cp_switches[DAY_ID], 10);
         day_switch_enabled = Arrays.copyOf(WeekProgramActivity.cp_switch_states[DAY_ID], 10);
         day_switch_types = Arrays.copyOf(WeekProgramActivity.cp_switch_types[DAY_ID], 10);
@@ -82,8 +87,12 @@ public class DayFragment extends Fragment implements ListView.OnItemClickListene
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_day, container, false);
-        lvDay = (ListView) view;
+        lvDay = (ListView) view.findViewById(R.id.lvDay);
         lvDay.setOnItemClickListener(this);
+
+        fabDay = (FloatingActionButton) view.findViewById(R.id.fabDay);
+        fabDay.setOnClickListener(this);
+
 
         lItems = new ArrayList<String>();
         for(int i = 0; i < day_switches.length; i++){
@@ -184,6 +193,57 @@ public class DayFragment extends Fragment implements ListView.OnItemClickListene
             day_switch_types[i] = getTypeFromText(lItems.get(i));
             day_switch_enabled[i] = true;
         }
+
+        //correct day/night count.
+        if(!isBalanced(day_switch_types)){
+            String lesserType = getLesserType(day_switch_types);
+            for(int i = 0; i < 10; i++){
+                if(isBalanced(day_switch_types)) break;
+
+                if(!day_switch_types[i].equals(lesserType) && day_switch_enabled[i] == false){
+                    // switch it
+                    day_switch_types[i] = swap_type(day_switch_types[i]);
+                }
+            }
+        }
+
+        WeekProgramActivity.cp_switches[DAY_ID] = Arrays.copyOf(this.day_switches, 10);
+        WeekProgramActivity.cp_switch_types[DAY_ID] = Arrays.copyOf(this.day_switch_types, 10);
+        WeekProgramActivity.cp_switch_states[DAY_ID] = Arrays.copyOf(this.day_switch_enabled, 10);
+
+        ThermostatData.putWeekProgram(WeekProgramActivity.cp_switches, WeekProgramActivity.cp_switch_types, WeekProgramActivity.cp_switch_states);
+
+        // Reload the fragment.
+        reloadLV();
+    }
+
+    private void reloadLV(){
+        // TODO
+    }
+
+    private String getLesserType(String[] types){
+        int nCount = 0, dCount = 0;
+        for(int i = 0; i < 10; i++){
+            if(types[i].contains("day")){
+                dCount++;
+            }else{
+                nCount++;
+            }
+        }
+        return (nCount < dCount) ? "night" : "day";
+    }
+
+    private boolean isBalanced(String[] types){
+        int nCount = 0, dCount = 0;
+        for(int i = 0; i < 10; i++){
+            if(types[i].contains("day")){
+                dCount++;
+            }else{
+                nCount++;
+            }
+        }
+
+        return (nCount == 5 && dCount == 5);
     }
 
     private String fiveOfEither(){
@@ -202,8 +262,67 @@ public class DayFragment extends Fragment implements ListView.OnItemClickListene
         return "neither";
     }
 
-    private String getTimeFromItem(String item){
+    private static String swap_type(String type){
+        if(type.equals("day")){
+            return "night";
+        }else{
+            return "day";
+        }
+    }
+
+    private static String getTimeFromItem(String item){
         return item.substring(item.length() - 5, item.length()).trim();
+    }
+
+    @Override
+    public void onClick(View v) {
+        // ONLY for floatingactionbutton. Do not use for anything else unless you implement a switch.
+        if(lItems.size() > 9){
+            Snackbar.make(v, "You have reached the maximum number of switches!", Snackbar.LENGTH_LONG)
+                    .setAction("", null).show();
+        }else{
+            newSwitch(v);
+        }
+    }
+
+    private void newSwitch(View view){
+        final View fView = view;
+        final Dialog d = new Dialog(this.getActivity());
+        d.setTitle("New Switch");
+        d.setContentView(R.layout.switch_edit);
+        final Switch swDayNight = (Switch) d.findViewById(R.id.swDayNight);
+
+        final TimePicker picker = (TimePicker) d.findViewById(R.id.timePicker);
+        Button btnSave = (Button) d.findViewById(R.id.btnSave);
+        Button btnDelete = (Button) d.findViewById(R.id.btnDelete);
+        btnDelete.setWidth(0); // make it essentially invisible.
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String strTime = String.valueOf(picker.getHour()) + ":" + String.valueOf(picker.getMinute());
+                String swType = (swDayNight.isChecked()) ? "night" : "day";
+                if(fiveOfEither().equals(swType)){
+                        Snackbar.make(fView, "Failed to save: Only 5 switches of each type allowed!", Snackbar.LENGTH_LONG)
+                                .setAction("", null).show();
+                        d.dismiss();
+                        return;
+                }
+                String item = "Switch to " + swType + " temperature\nat " + GeneralHelper.correctTime(strTime);
+
+                lItems.add(item);
+                listAdapter.clear();
+                listAdapter.addAll(lItems);
+                listAdapter.notifyDataSetChanged();
+                updateAndSaveSchedule();
+                d.dismiss();
+            }
+        });
+        picker.setIs24HourView(true);
+        picker.setHour(10);
+        picker.setMinute(10);
+
+        d.show();
     }
 
     /**

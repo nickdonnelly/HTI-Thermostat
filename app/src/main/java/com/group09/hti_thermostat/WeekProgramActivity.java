@@ -16,7 +16,7 @@ import android.widget.ScrollView;
 
 import java.util.Arrays;
 
-public class WeekProgramActivity extends AppCompatActivity implements View.OnClickListener {
+public class WeekProgramActivity extends AppCompatActivity {
 
     private int DAY_ID = 0; // Start it on monday
 
@@ -36,13 +36,11 @@ public class WeekProgramActivity extends AppCompatActivity implements View.OnCli
         setContentView(R.layout.activity_week_program);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         vpSchedule = (ViewPager) findViewById(R.id.vpSchedule);
         vpSchedule.setAdapter(new DayPagerFragmentAdapter(getSupportFragmentManager(), WeekProgramActivity.this));
         tlDays = (TabLayout) findViewById(R.id.tabLayoutWeek);
         tlDays.setupWithViewPager(vpSchedule);
         tlDays.setTabTextColors(Color.LTGRAY, Color.WHITE);
-        fab.setOnClickListener(this);
 //                  Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
 
@@ -60,15 +58,6 @@ public class WeekProgramActivity extends AppCompatActivity implements View.OnCli
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Week Program");
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch(v.getId()){
-            case R.id.fab:
-                Log.d("CLICK EVENT", "Floating action button");
-                break;
-        }
     }
 
 }
